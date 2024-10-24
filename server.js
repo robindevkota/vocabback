@@ -17,7 +17,7 @@ app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(
   cors({
-    origin: ['http://localhost:3000', 'https://api.dictionaryapi.dev', 'https://authz-app.vercel.app', 'http://192.168.18.10:3000'],
+    origin: ['http://localhost:3000','https://vocabmate.netlify.app', 'http://192.168.18.10:3000'],
     credentials: true,
   })
 );
