@@ -1,14 +1,42 @@
 const Word = require('../models/Word');
 
 // Fetch all words for a specific user
+// exports.getWords = async (req, res) => {
+//   try {
+//     const words = await Word.find({ userId: req.user._id }).sort({createdAt:-1});
+//     res.json(words);
+//   } catch (error) {
+//     res.status(500).json({ message: 'Error fetching words' });
+//   }
+// };
+
 exports.getWords = async (req, res) => {
+  // console.log("🔍 getWords controller triggered");
+
   try {
-    const words = await Word.find({ userId: req.user._id }).sort({createdAt:-1});
+    const searchQuery = req.query.search;  // Search term
+    const userId = req.user._id;
+
+    // Build the base filter with userId
+    const filter = { userId };
+
+    // If there's a search query, add the regex filter for 'word' field
+    if (searchQuery && searchQuery.trim() !== "") {
+      filter.word = { $regex: new RegExp(searchQuery, "i") };  // Case-insensitive search
+    }
+
+    // console.log("📦 Applied Filter:", filter); // Check the final filter
+
+    const words = await Word.find(filter).sort({ createdAt: -1 });
+
     res.json(words);
   } catch (error) {
-    res.status(500).json({ message: 'Error fetching words' });
+    console.error("❌ Error fetching words:", error);
+    res.status(500).json({ message: "Error fetching words" });
   }
 };
+
+
 // Fetch a friend's words by their user ID
 // Fetch a friend's words by their user ID
 exports.getFriendWords = async (req, res) => {
