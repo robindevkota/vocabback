@@ -62,18 +62,12 @@ if (userExists) {
   const token = generateToken(user._id);
 
   // Send HTTP-only cookie
-  // res.cookie("token", token, {
-  //   path: "/",
-  //   httpOnly: true,
-  //   expires: new Date(Date.now() + 1000 * 86400), // 1 day
-  //   sameSite: "none",
-  //   secure: true,
-  // });
   res.cookie("token", token, {
+    path: "/",
     httpOnly: true,
-    secure: true,            // REQUIRED for SameSite: "None"
-    sameSite: "None",        // REQUIRED for iOS + cross-origin requests
-    maxAge: 24 * 60 * 60 * 1000, // 1 day (more consistent than expires)
+    expires: new Date(Date.now() + 1000 * 86400), // 1 day
+    sameSite: "none",
+    secure: true,
   });
 
   if (user) {
@@ -157,18 +151,12 @@ const loginUser = asyncHandler(async (req, res) => {
 
   if (user && passwordIsCorrect) {
     // Send HTTP-only cookie
-    // res.cookie("token", token, {
-    //   path: "/",
-    //   httpOnly: true,
-    //   expires: new Date(Date.now() + 1000 * 86400), // 1 day
-    //   sameSite: "none",
-    //   secure: true,
-    // });
     res.cookie("token", token, {
+      path: "/",
       httpOnly: true,
-      secure: true,            // REQUIRED for SameSite: "None"
-      sameSite: "None",        // REQUIRED for iOS + cross-origin requests
-      maxAge: 24 * 60 * 60 * 1000, // 1 day (more consistent than expires)
+      expires: new Date(Date.now() + 1000 * 86400), // 1 day
+      sameSite: "none",
+      secure: true,
     });
 
     const { _id, name, email, phone, bio, photo, role, isVerified } = user;
@@ -279,18 +267,12 @@ const loginWithCode = asyncHandler(async (req, res) => {
     const token = generateToken(user._id);
 
     // Send HTTP-only cookie
-    // res.cookie("token", token, {
-    //   path: "/",
-    //   httpOnly: true,
-    //   expires: new Date(Date.now() + 1000 * 86400), // 1 day
-    //   sameSite: "none",
-    //   secure: true,
-    // });
     res.cookie("token", token, {
+      path: "/",
       httpOnly: true,
-      secure: true,            // REQUIRED for SameSite: "None"
-      sameSite: "None",        // REQUIRED for iOS + cross-origin requests
-      maxAge: 24 * 60 * 60 * 1000, // 1 day (more consistent than expires)
+      expires: new Date(Date.now() + 1000 * 86400), // 1 day
+      sameSite: "none",
+      secure: true,
     });
 
     const { _id, name, email, phone, bio, photo, role, isVerified } = user;
@@ -404,18 +386,12 @@ const verifyUser = asyncHandler(async (req, res) => {
 
 // Logout User
 const logoutUser = asyncHandler(async (req, res) => {
-  // res.cookie("token", "", {
-  //   path: "/",
-  //   httpOnly: true,
-  //   expires: new Date(0), // 1 day
-  //   sameSite: "none",
-  //   secure: true,
-  // });
-  res.cookie("token", token, {
+  res.cookie("token", "", {
+    path: "/",
     httpOnly: true,
-    secure: true,            // REQUIRED for SameSite: "None"
-    sameSite: "None",        // REQUIRED for iOS + cross-origin requests
-    maxAge: 24 * 60 * 60 * 1000, // 1 day (more consistent than expires)
+    expires: new Date(0), // 1 day
+    sameSite: "none",
+    secure: true,
   });
   return res.status(200).json({ message: "Logout successful" });
 });
@@ -726,18 +702,12 @@ const loginWithGoogle = asyncHandler(async (req, res) => {
       const token = generateToken(newUser._id);
 
       // Send HTTP-only cookie
-      // res.cookie("token", token, {
-      //   path: "/",
-      //   httpOnly: true,
-      //   expires: new Date(Date.now() + 1000 * 86400), // 1 day
-      //   sameSite: "none",
-      //   secure: true,
-      // });
       res.cookie("token", token, {
+        path: "/",
         httpOnly: true,
-        secure: true,            // REQUIRED for SameSite: "None"
-        sameSite: "None",        // REQUIRED for iOS + cross-origin requests
-        maxAge: 24 * 60 * 60 * 1000, // 1 day (more consistent than expires)
+        expires: new Date(Date.now() + 1000 * 86400), // 1 day
+        sameSite: "none",
+        secure: true,
       });
 
       const { _id, name, email, phone, bio, photo, role, isVerified } = newUser;
@@ -761,20 +731,14 @@ const loginWithGoogle = asyncHandler(async (req, res) => {
     const token = generateToken(user._id);
 
     // Send HTTP-only cookie
-    // res.cookie("token", token, {
-    //   path: "/",
-    //   httpOnly: true,
-    //   expires: new Date(Date.now() + 1000 * 86400), // 1 day
-    //   sameSite: "none",
-    //   secure: true,
-    // });
-
     res.cookie("token", token, {
+      path: "/",
       httpOnly: true,
-      secure: true,            // REQUIRED for SameSite: "None"
-      sameSite: "None",        // REQUIRED for iOS + cross-origin requests
-      maxAge: 24 * 60 * 60 * 1000, // 1 day (more consistent than expires)
+      expires: new Date(Date.now() + 1000 * 86400), // 1 day
+      sameSite: "none",
+      secure: true,
     });
+
     const { _id, name, email, phone, bio, photo, role, isVerified } = user;
 
     res.status(201).json({

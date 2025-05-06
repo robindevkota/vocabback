@@ -35,69 +35,75 @@ const refreshAccessToken = async (refreshToken) => {
 };
 
 const protect = asyncHandler(async (req, res, next) => {
-  let token = req.cookies.token;
-  const refreshToken = req.cookies.refreshToken;
-
-  if (!token && !refreshToken) {
-    res.status(401);
-    throw new Error("Not authorized, please login");
-  }
-
   try {
-    const verified = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(verified.id).select("-password");
+    const token = req.cookies.token;
+    const refreshToken = req.cookies.refreshToken; // Assuming you have a refresh token
 
-    if (!user) {
-      res.status(404);
-      throw new Error("User not found");
+    if (!token && !refreshToken) {
+      res.status(401);
+      throw new Error("Not authorized, please login");
     }
 
-    if (user.role === "suspended") {
-      res.status(400);
-      throw new Error("User suspended, please contact support");
-    }
+    try {
+      // Verify token
+      const verified = jwt.verify(token, process.env.JWT_SECRET);
+      // Get user id from token
+      const user = await User.findById(verified.id).select("-password");
 
-    req.user = user;
-    return next();
-  } catch (err) {
-    // Token expired or invalid
-    if (refreshToken) {
-      try {
+      // Check if the cookie has expired
+      const isTokenExpired = verified.exp < Date.now() / 1000;
+      if (isTokenExpired && refreshToken) {
+        // Refresh the access token
         const newToken = await refreshAccessToken(refreshToken);
-        const refreshedVerified = jwt.verify(newToken, process.env.JWT_SECRET);
-        const refreshedUser = await User.findById(refreshedVerified.userId).select("-password");
 
-        if (!refreshedUser) {
-          res.status(404);
-          throw new Error("User not found");
-        }
-
-        if (refreshedUser.role === "suspended") {
-          res.status(400);
-          throw new Error("User suspended, please contact support");
-        }
-
+        // Send the new token in the response
         res.cookie("token", newToken, {
           path: "/",
           httpOnly: true,
-          expires: new Date(Date.now() + 1000 * 86400),
+          expires: new Date(Date.now() + 1000 * 86400), // 1 day
           sameSite: "none",
           secure: true,
         });
 
-        req.user = refreshedUser;
+        // Continue with the rest of the code
+        // Verify token
+        const verified = jwt.verify(newToken, process.env.JWT_SECRET);
+        // Get user id from token
+        const user = await User.findById(verified.id).select("-password");
+
+        if (!user) {
+          res.status(404);
+          throw new Error("User not found");
+        }
+        if (user.role === "suspended") {
+          res.status(400);
+          throw new Error("User suspended, please contact support");
+        }
+
+        req.user = user;
         return next();
-      } catch (refreshError) {
-        res.status(401);
-        throw new Error("Not authorized, refresh token invalid");
       }
-    } else {
+      // Continue with the rest of the code
+      if (!user) {
+        res.status(404);
+        throw new Error("User not found");
+      }
+      if (user.role === "suspended") {
+        res.status(400);
+        throw new Error("User suspended, please contact support");
+      }
+
+      req.user = user;
+      next();
+    } catch (error) {
       res.status(401);
       throw new Error("Not authorized, please login");
     }
+  } catch (error) {
+    res.status(401);
+    throw new Error("Not authorized, please login");
   }
 });
-
 
 const verifiedOnly = asyncHandler(async (req, res, next) => {
   if (req.user && req.user.isVerified) {
